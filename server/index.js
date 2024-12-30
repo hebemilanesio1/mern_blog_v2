@@ -10,10 +10,13 @@ const app = express();
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/PostRoutes');
 require('dotenv').config();
+const connectDB = require('./config/db');
+
+connectDB();
 
 // Configuración de CORS
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['https://mernblog-flame.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -21,15 +24,13 @@ app.use(cors({
 // Middleware para parsear JSON
 app.use(bodyParser.json());
 
-
 // Configurar la carpeta de uploads para servir archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
-// Conectar a la base de datos MongoDB
-const mongoURI = 'mongodb://localhost:27017/bbdd_mern_blog';
+// Conectar a la base de datos MongoDB Atlas
+const mongoURI = process.env.MONGO_URI; // Usando la variable de entorno para la URI de MongoDB Atlas
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('Conectado a la base de datos'))
+    .then(() => console.log('Conectado a MongoDB Atlas'))
     .catch((error) => console.log(error));
 
 // Configuración de GridFS
@@ -65,10 +66,9 @@ app.use('/api/uploads', upload.single('file'), (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/posts', postRoutes); 
+app.use('/api/posts', postRoutes);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
-

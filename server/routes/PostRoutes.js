@@ -1,27 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const Post = require('../models/Post'); // Importa el modelo de Post
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Configuración de multer para manejar imágenes
+const { protect } = require('../middleware/authMiddleware');
+const authenticateToken = require('../middleware/authenticateToken');
+const Post = require('../models/Post'); // Asegúrate de importar el modelo Post
+const { createPost } = require('../controllers/postController');
+const { getMyPosts } = require('../controllers/postController');
+const { getPostById } = require('../controllers/postController');
+const { updatePost } = require('../controllers/postController'); 
+const { getAllPosts } = require('../controllers/postController')
+const { getPostWithCreator } = require('../controllers/postController')
 
-// Ruta para crear un nuevo post
-router.post('/', upload.single('thumbnail'), async (req, res) => {
+router.post('/', protect, createPost);
+
+router.get('/', getAllPosts);
+
+// Obtener los posts del usuario logueado
+router.get('/my-posts', authenticateToken, getMyPosts);
+
+// Obtener un post por ID
+router.get('/:id', getPostById);
+
+// Ruta para actualizar un post
+router.put('/:id', protect, updatePost); // Aquí agregamos el endpoint PUT para actualizar el post
+
+router.delete('/:id', async (req, res) => {
     try {
-        const thumbnailUrl = req.file ? req.file.path : ''; // Asignamos la URL de la imagen (si se carga una)
-
-        const newPost = new Post({
-            title: req.body.title,
-            category: req.body.category,
-            description: req.body.description,
-            thumbnail: thumbnailUrl, // Guardamos la ruta de la imagen o URL
-            author: req.user._id, // Asumiendo que tienes un sistema de autenticación
-        });
-
-        await newPost.save();
-        res.status(201).json(newPost); // Respondemos con el post creado
+        const deletedPost = await Post.findByIdAndDelete(req.params.id);
+        if (!deletedPost) {
+            return res.status(404).json({ message: 'Post no encontrado' });
+        }
+        res.status(200).json({ message: 'Post eliminado correctamente' });
     } catch (error) {
-        res.status(500).json({ message: 'Error al crear el post', error });
+        res.status(500).json({ message: 'Error al eliminar el post', error });
     }
 });
+
+router.get('/post-with-creator/:id', getPostWithCreator);
 
 module.exports = router;

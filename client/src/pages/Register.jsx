@@ -1,5 +1,6 @@
-import React, { useState } from 'react'; // Importar useState
-import {Link } from 'react-router-dom'
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+
 const Register = () => {
     const [userData, setUserData] = useState({
         name: '',
@@ -7,8 +8,10 @@ const Register = () => {
         password: '',
         password2: '',
     });
+    const [error, setError] = useState(null);  // Para manejar errores
+    const [successMessage, setSuccessMessage] = useState('');  // Para manejar el mensaje de éxito
+    const navigate = useNavigate();
 
-    // Manejar cambios en los inputs
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUserData((prevData) => ({
@@ -17,18 +20,57 @@ const Register = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Lógica para manejar el envío del formulario
-        console.log('User Data Submitted:', userData);
+
+        // Verificar si las contraseñas coinciden
+        if (userData.password !== userData.password2) {
+            setError("Las contraseñas no coinciden");
+            return;
+        }
+
+        // Enviar los datos al backend
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: userData.name,
+                    email: userData.email,
+                    password: userData.password,
+                }),
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                // Si la respuesta es exitosa, mostrar un mensaje de éxito
+                setSuccessMessage(responseData.message || 'Usuario registrado con éxito');
+                setError(null); // Limpiar los posibles errores
+                setTimeout(() => navigate('/login'), 2000);  // Redirigir a login después de 2 segundos
+            } else {
+                // Si hay un error, mostrar el mensaje de error
+                setError(responseData.message || 'Hubo un error al registrar el usuario');
+                setSuccessMessage('');  // Limpiar mensaje de éxito
+            }
+        } catch (err) {
+            setError("Error de red: " + err.message);
+            setSuccessMessage('');
+        }
     };
 
     return (
         <section className="register">
             <div className="container">
-                <h2>Sign Up</h2>
+                <h2>Registrate</h2>
+
+                {/* Mostrar el mensaje de éxito o error */}
+                {successMessage && <p className="success-message">{successMessage}</p>}
+                {error && <p className="error-message">{error}</p>}
+
                 <form className="form register__form" onSubmit={handleSubmit}>
-                    <p className="form__error-message">This is an error message</p>
                     <input
                         type="text"
                         placeholder="Full Name"
@@ -61,10 +103,12 @@ const Register = () => {
                         Register
                     </button>
                 </form>
-                <small>Already have an account? <Link to = "/login">Sign In</Link></small>
+
+                <small>¿Ya tienes una cuenta? <Link to="/login">Ingresar</Link></small>
             </div>
         </section>
     );
 };
 
 export default Register;
+

@@ -1,9 +1,11 @@
 import React from 'react'
-import Posts from '../components/Posts'
+import AllPost from '../pages/AllPost'
 
 const Home = () => {
     return (
-        <Posts />
+        <AllPost />
     )
 }
 export default Home
+
+//aca vamos a hacer otro como my post pero que muestre todos los posteos creadis

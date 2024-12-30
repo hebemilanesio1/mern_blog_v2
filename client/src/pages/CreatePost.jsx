@@ -1,71 +1,106 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const CreatePost = () => {
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('Uncategorized');
     const [description, setDescription] = useState('');
-    const [ setThumbnail] = useState('');
 
-    const modules = {
-        toolbar: [
-            [{ header: [1, 2, false] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-            [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-            ['link', 'image'],
-            ['clean'],
-        ],
-    };
+    const [file, setFile] = useState(null); // Guarda el archivo
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const navigate = useNavigate();
 
-    const formats = [
-        'header',
-        'bold', 'italic', 'underline', 'strike', 'blockquote',
-        'list', 'bullet', 'indent',
-        'link', 'image',
-    ];
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        setIsAuthenticated(!!token);
+    }, []);
 
     const POST_CATEGORIES = ["Agriculture", "Business", "Education", "Entertainment", "Art", "Investment", "Uncategorized", "Weather"];
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setFile(file);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('category', category);
+        formData.append('description', description);
+        if (file) {
+            formData.append('thumbnail', file);
+        }
+
+        console.log('Datos a enviar:', Object.fromEntries(formData));
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post('http://localhost:5000/api/posts', formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            console.log('Post creado:', response.data);
+            navigate('/all-post');
+        } catch (error) {
+            console.error('Error al crear el post:', error);
+        }
+    };
+
+    const handleLoginRedirect = () => {
+        if (!isAuthenticated) {
+            navigate('/login');
+        }
+    };
 
     return (
         <section className="create-post">
             <div className="container">
-                <h2>Create New Post</h2>
-                <p className="form__error-message">
-                    This is an error message
-                </p>
-                <form className="form create-post__form">
-                    <input
-                        type="text"
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        autoFocus
-                    />
-                    <select
-                        name="category"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                    >
-                        {
-                            POST_CATEGORIES.map((cat, index) => (
+                <h2>Crear nuevo posteo</h2>
+
+                {!isAuthenticated && (
+                    <p className="form__error-message">
+                        Para crear un posteo, por favor, <button className="btn secondary" onClick={handleLoginRedirect}>Inicia sesión</button>
+                    </p>
+                )}
+
+                {isAuthenticated && (
+                    <form className="form create-post__form" onSubmit={handleSubmit}>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            autoFocus
+                        />
+                        <select
+                            name="category"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                        >
+                            {POST_CATEGORIES.map((cat, index) => (
                                 <option key={index} value={cat}>{cat}</option>
-                            ))
-                        }
-                    </select>
-                    <ReactQuill
-                        modules={modules}
-                        formats={formats}
-                        value={description}
-                        onChange={setDescription}
-                    />
-                    <input
-                        type="file"
-                        onChange={(e) => setThumbnail(e.target.files[0])}
-                        accept="png,jpg,jpeg"
-                    />
-                    <button type="submit" className="btn primary">Create</button>
-                </form>
+                            ))}
+                        </select>
+                        <ReactQuill
+                            value={description}
+                            onChange={setDescription}
+                        />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                        <button type="submit" className="btn primary">Crear</button>
+                    </form>
+                )}
             </div>
         </section>
     );

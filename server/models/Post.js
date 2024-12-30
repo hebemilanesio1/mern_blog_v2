@@ -1,34 +1,12 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const postSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    category: {
-        type: String,
-        enum: ["Agriculture", "Business", "Education", "Entertainment", "Art", "Investment", "Uncategorized", "Weather"],
-        default: "Uncategorized"
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    thumbnail: {
-        type: String, // Aquí puedes guardar la URL de la imagen
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Hace referencia al modelo de Usuario
-        required: true
-    }
-});
+const postSchema = new Schema({
+    title: { type: String, required: true },
+    category: { type: String, required: true },
+    description: { type: String, required: true },
+    thumbnail: { type: String, required: false },
+    creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Asegúrate de que 'creator' sea un ObjectId y esté referenciando el modelo User
+}, { timestamps: true });
 
-const Post = mongoose.model('Post', postSchema);
-
-module.exports = Post;
+module.exports = mongoose.model('Post', postSchema);

@@ -1,18 +1,16 @@
-import React from 'react'
-import {Link} from 'react-router-dom'
-import Avatar from '../images/avatar1.jpg'
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const PostAuthor = () => {
+const PostAuthor = ({ creator }) => {
+    if (!creator) return null; // Asegúrate de manejar el caso donde creator sea nulo
+
     return (
-        <Link to = {`/posts/users/sdfsdf`} className='post__author'>
-            <div className="post__author-avatar">
-                <img src={Avatar} alt="" />
-            </div>
+        <Link to={`/users/${creator._id}`} className="post__author">
             <div className="post__author-details">
-                <h5>By: Andrea Taylor</h5>
-                <small>Just Now</small>
+                <small>{creator.username || 'Autor desconocido'}</small>
             </div>
         </Link>
-    )
-}
-export default PostAuthor
+    );
+};
+
+export default PostAuthor;

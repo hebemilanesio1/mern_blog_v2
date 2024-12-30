@@ -19,7 +19,7 @@ const Header = () => {
     <nav className="nav">
       <div className="container nav__container">
         {/* Logo */}
-        <Link to="/" className="nav__logo">
+        <Link to="/all-post" className="nav__logo">
           <img src={Logo} alt="Navbar Logo" />
         </Link>
 
@@ -27,22 +27,22 @@ const Header = () => {
         <ul className={`nav__menu ${isNavShowing ? "show" : ""}`}>
           <li>
             <Link to="/profile/sdfsdf" onClick={closeNavHandler}>
-              Andrea Taylor
+              Mi perfil
             </Link>
           </li>
           <li>
             <Link to="/create" onClick={closeNavHandler}>
-              Create Post
+              Crear nuevo posteo
             </Link>
           </li>
           <li>
-            <Link to="/authors" onClick={closeNavHandler}>
-              Authors
+            <Link to="/my-posts" onClick={closeNavHandler}>
+              Mis posteos
             </Link>
           </li>
           <li>
-            <Link to="/logout" onClick={closeNavHandler}>
-              Logout
+            <Link to="/login" onClick={closeNavHandler}>
+              Iniciar sesión
             </Link>
           </li>
         </ul>

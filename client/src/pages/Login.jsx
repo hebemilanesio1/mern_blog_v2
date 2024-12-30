@@ -1,12 +1,15 @@
-import React, { useState } from 'react'; // Importar useState
-import {Link } from 'react-router-dom'
+import React, { useState } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+
 const Login = () => {
     const [userData, setUserData] = useState({
         email: '',
         password: '',
     });
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    // Manejar cambios en los inputs
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUserData((prevData) => ({
@@ -15,24 +18,36 @@ const Login = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Lógica para manejar el envío del formulario
-        console.log('User Data Submitted:', userData);
-    };
+        console.log('Datos enviados:', userData);
+    
+        try {
+            const response = await axios.post('http://localhost:5000/api/auth/login', userData);
+    
+            if (response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                navigate('/my-posts');  // Redirigir al componente CreatePost
+            }
+        } catch (error) {
+            console.error('Error en el inicio de sesión:', error.response?.data || error.message);
+            setError('Email o contraseña incorrectos');
+        }
+    };    
 
     return (
         <section className="login">
             <div className="container">
-                <h2>Sign In</h2>
+                <h2>Ingresar</h2>
+                {error && <p className="form__error-message">{error}</p>}
                 <form className="form login__form" onSubmit={handleSubmit}>
-                    <p className="form__error-message">This is an error message</p>
                     <input
                         type="email"
                         placeholder="Email"
                         name="email"
                         value={userData.email}
                         onChange={handleChange}
+                        required
                     />
                     <input
                         type="password"
@@ -40,12 +55,15 @@ const Login = () => {
                         name="password"
                         value={userData.password}
                         onChange={handleChange}
+                        required
                     />
                     <button type="submit" className="btn primary">
-                        Login
+                        Iniciar sesión
                     </button>
                 </form>
-                <small>Don't have an account? <Link to = "/register">Sign Up</Link></small>
+                <small>
+                    ¿No tienes cuenta? <Link to="/register">Registrarse</Link>
+                </small>
             </div>
         </section>
     );

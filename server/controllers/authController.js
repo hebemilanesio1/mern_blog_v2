@@ -6,13 +6,8 @@ const protect = async (req, res, next) => {
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
-            // Obtener el token
             token = req.headers.authorization.split(' ')[1];
-
-            // Verificar el token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            // Adjuntar el usuario al request
             req.user = await User.findById(decoded.userId).select('-password');
 
             next();

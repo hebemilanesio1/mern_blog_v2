@@ -10,19 +10,16 @@ const UserProfile = () => {
     const [email, setEmail] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     
-    const navigate = useNavigate(); // Hook de navegación para redirigir
-
-    // Función para verificar si el usuario está autenticado
+    const navigate = useNavigate(); 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
-            navigate('/login'); // Redirigir al login si no está autenticado
+            navigate('/login');
         } else {
             getUserData();
         }
     }, [navigate]);
 
-    // Función para obtener los datos del usuario
     const getUserData = async () => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -35,20 +32,19 @@ const UserProfile = () => {
                 const userData = response.data;
                 setUsername(userData.username);
                 setEmail(userData.email);
-                setAvatar(userData.avatar || defaultAvatar); // Si no tiene avatar, usar el avatar por defecto
+                setAvatar(userData.avatar || defaultAvatar);
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
         }
     };
 
-    // Función para cerrar sesión
+
     const logout = () => {
-        localStorage.removeItem('token'); // Eliminar el token de localStorage
-        navigate('/login'); // Redirigir a la página de login
+        localStorage.removeItem('token');
+        navigate('/login'); 
     };
 
-    // Función para actualizar el avatar
     const handleAvatarChange = (e) => {
         setAvatar(URL.createObjectURL(e.target.files[0]));
     };

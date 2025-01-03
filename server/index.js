@@ -14,26 +14,21 @@ const connectDB = require('./config/db');
 
 connectDB();
 
-// Configuración de CORS
 app.use(cors({
     origin: ['https://mernblog-flame.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Middleware para parsear JSON
 app.use(bodyParser.json());
 
-// Configurar la carpeta de uploads para servir archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Conectar a la base de datos MongoDB Atlas
-const mongoURI = process.env.MONGO_URI; // Usando la variable de entorno para la URI de MongoDB Atlas
+const mongoURI = process.env.MONGO_URI; 
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Conectado a MongoDB Atlas'))
     .catch((error) => console.log(error));
 
-// Configuración de GridFS
 let gfs;
 const conn = mongoose.connection;
 conn.once('open', () => {

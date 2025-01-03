@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const authenticateToken = require('../middleware/authenticateToken');
-const Post = require('../models/Post'); // Asegúrate de importar el modelo Post
+const Post = require('../models/Post'); 
 const { createPost } = require('../controllers/postController');
 const { getMyPosts } = require('../controllers/postController');
 const { getPostById } = require('../controllers/postController');
@@ -14,14 +14,11 @@ router.post('/', protect, createPost);
 
 router.get('/', getAllPosts);
 
-// Obtener los posts del usuario logueado
 router.get('/my-posts', authenticateToken, getMyPosts);
 
-// Obtener un post por ID
 router.get('/:id', getPostById);
 
-// Ruta para actualizar un post
-router.put('/:id', protect, updatePost); // Aquí agregamos el endpoint PUT para actualizar el post
+router.put('/:id', protect, updatePost);
 
 router.delete('/:id', async (req, res) => {
     try {

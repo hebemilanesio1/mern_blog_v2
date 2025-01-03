@@ -1,7 +1,6 @@
 const Post = require('../models/Post');
 const multer = require('multer');
 
-// Configuración de multer para manejar la subida de imágenes
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -12,7 +11,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage }).single('thumbnail');
 
-// Crear un nuevo post
 const createPost = async (req, res) => {
     upload(req, res, async (err) => {
         if (err) {
@@ -22,8 +20,7 @@ const createPost = async (req, res) => {
         try {
             const { title, category, description } = req.body;
 
-            // Verificar que req.user contiene el id del usuario
-            console.log('Usuario autenticado:', req.user);  // Verifica si tiene el campo id
+            console.log('Usuario autenticado:', req.user); 
 
             if (!req.user || !req.user.userId) {
                 return res.status(400).json({ message: 'Usuario no autenticado' });
@@ -34,7 +31,7 @@ const createPost = async (req, res) => {
                 category,
                 description,
                 thumbnail: req.file ? req.file.filename : null,
-                creator: req.user.userId,  // Asegúrate de que req.user.userId esté presente
+                creator: req.user.userId, 
             });
 
             const savedPost = await newPost.save();
@@ -54,11 +51,9 @@ const createPost = async (req, res) => {
     });
 };
 
-// Obtener los posteos del usuario autenticado
-// Obtener los posteos de un usuario específico
 const getMyPosts = async (req, res) => {
     try {
-        const userId = req.user.id;  // Obtener el ID del usuario autenticado
+        const userId = req.user.id; 
 
         if (!userId) {
             return res.status(400).json({ message: 'Usuario no autenticado' });
@@ -66,10 +61,9 @@ const getMyPosts = async (req, res) => {
 
         console.log('Buscando posts para el usuario con ID:', userId);
 
-        // Filtrar los posteos por el creator (usuario)
-        const posts = await Post.find({ creator: userId }).populate('creator'); // Utiliza populate si deseas obtener detalles del usuario
+        const posts = await Post.find({ creator: userId }).populate('creator');
 
-        res.status(200).json(posts);  // Devuelve los posteos filtrados
+        res.status(200).json(posts);  
     } catch (error) {
         console.error('Error al obtener los posteos:', error);
         res.status(500).json({ message: 'Error al obtener los posteos' });
@@ -79,7 +73,7 @@ const getMyPosts = async (req, res) => {
 
 const getPostById = async (req, res) => {
     try {
-        console.log('Post ID:', req.params.id); // Log para verificar el id
+        console.log('Post ID:', req.params.id); 
         const post = await Post.findById(req.params.id);
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
@@ -107,7 +101,6 @@ const updatePost = async (req, res) => {
     const postId = req.params.id;
     const { title, description, category, thumbnail } = req.body;
 
-    // Verificar que el postId y los datos necesarios estén presentes
     if (!postId) {
         return res.status(400).json({ message: 'ID de post no proporcionado' });
     }
@@ -117,20 +110,17 @@ const updatePost = async (req, res) => {
     }
 
     try {
-        // Buscar el post por ID
         const post = await Post.findById(postId);
         
         if (!post) {
             return res.status(404).json({ message: 'Post no encontrado' });
         }
 
-        // Actualizar los valores
         post.title = title;
-        post.description = description;  // Asegúrate de actualizar el contenido
+        post.description = description;
         post.category = category;
         post.thumbnail = thumbnail;
 
-        // Guardar el post actualizado
         await post.save();
 
         return res.status(200).json(post);
@@ -142,8 +132,8 @@ const updatePost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find();  // Recupera todos los posteos
-        res.status(200).json(posts);  // Devuelve los posteos como una respuesta JSON
+        const posts = await Post.find(); 
+        res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener los posteos', error });
     }

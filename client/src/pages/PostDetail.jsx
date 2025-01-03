@@ -15,8 +15,8 @@ const PostDetail = () => {
         const token = localStorage.getItem('token');
         if (token) {
             setIsAuthenticated(true);
-            const decoded = jwtDecode(token); // Decodificar el token
-            setUserId(decoded.userId); // Cambia esto al campo que representa al usuario en tu token
+            const decoded = jwtDecode(token);
+            setUserId(decoded.userId); 
         }
 
         const fetchPost = async () => {

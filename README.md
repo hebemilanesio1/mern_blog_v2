@@ -29,6 +29,8 @@ Requisitos previos
 * MongoDB Atlas configurado
 * MongoDB Compass (Utilizado para el desarrollo local)
 
+![image](https://github.com/user-attachments/assets/b2a12e76-a754-4600-be7a-90050bce69ec)
+
 Nota: Actualmente, la API solo funciona cuando se ejecuta npm run dev localmente debido a configuraciones pendientes en Vercel. Se recomienda revisar la configuración de Vercel para asegurar que el backend esté correctamente desplegado y funcione de manera independiente.
 
 Rutas de la API
@@ -109,6 +111,10 @@ Crea una rama con una nueva funcionalidad (feature/nueva-funcionalidad).
 
 Realiza un pull request describiendo los cambios realizados.
 
+
+Video demostrativo:
+
+https://drive.google.com/file/d/1L52Qpk9tZR3dXKf26a8D6lHjOd5y0uhu/view?usp=sharing
 
 Desarrollado por: 
 
